@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark, .dark *));
+
+@layer base {
+  button {
+    @apply transition-transform hover:scale-105 active:scale-95;
+  }
+}

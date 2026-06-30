@@ -1,0 +1,6 @@
+{
+  "name": "UKIS-Ulusal Konteyner İzleme Sistemi",
+  "description": "Frontend, Backend ve Güvenlik katmanlarını barındıran tam teşekküllü (Full-Stack) proje şablonu.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API", "MAJOR_CAPABILITY_CLOUD_SQL"]
+}
