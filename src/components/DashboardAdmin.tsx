@@ -528,11 +528,11 @@ export function DashboardAdmin() {
                 </div>
               </div>
               {d.description && <div className="bg-blue-50/50 dark:bg-blue-900/20 p-3 rounded-lg text-slate-700 dark:text-slate-300">{d.description}</div>}
-              {d.items && (
+              {d.items && d.items.length > 0 && (
                 <div className="mt-3 flex flex-col gap-2 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
                   <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Karşılanacak Ürünler</h4>
                   <ul className="flex flex-col gap-1.5">
-                    {(Array.isArray(d.items) ? d.items : []).map((i, idx) => (
+                    {d.items.map((i, idx) => (
                       <li key={idx} className="flex items-center gap-2 text-sm">
                         <span className="font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded shadow-sm">{i.quantity} ADET</span>
                         <span className="text-slate-700 dark:text-slate-300 font-medium">{i.productName}</span>
