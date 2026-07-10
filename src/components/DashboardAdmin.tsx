@@ -1,102 +1,125 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api';
-import { Container, RequestItem, Report, Donation, Issue } from '../types';
+import { Container, RequestItem, Report, Donation, Issue, Product } from '../types';
 import { AdminChat } from './AdminChat';
-import { Trash2, BellOff, Search, Filter, RefreshCw } from 'lucide-react';
+import { Trash2, BellOff, Search, Filter, RefreshCw, AlertTriangle } from 'lucide-react';
 import { showToast } from '../lib/toast';
 
-class SirenSynth {
-  audioCtx: AudioContext | null = null;
-  oscillator: OscillatorNode | null = null;
-  lfo: OscillatorNode | null = null;
-  lfoGain: GainNode | null = null;
-  gainNode: GainNode | null = null;
-  isPlaying = false;
-  currentTime = 0; // Mock to satisfy TS
-
-  init() {
-    if (!this.audioCtx) {
-      this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-  }
-
-  play() {
-    if (this.isPlaying) return Promise.resolve();
-    this.isPlaying = true;
-    this.init();
-
-    if (this.audioCtx?.state === 'suspended') {
-      this.audioCtx.resume();
-    }
-
-    this.oscillator = this.audioCtx!.createOscillator();
-    this.lfo = this.audioCtx!.createOscillator();
-    this.lfoGain = this.audioCtx!.createGain();
-    this.gainNode = this.audioCtx!.createGain();
-
-    // Main oscillator (sawtooth for clear, bright siren sound)
-    this.oscillator.type = 'sawtooth';
-    this.oscillator.frequency.value = 900; // Center frequency
-
-    // LFO for "viu viu" sweep (Yelp siren)
-    this.lfo.type = 'sine';
-    this.lfo.frequency.value = 4.5; // Sweeps per second - very fast
-    
-    // Frequency variation (900 +/- 350 Hz = 550Hz to 1250Hz)
-    this.lfoGain.gain.value = 350;
-    
-    // Connect LFO to main oscillator frequency
-    this.lfo.connect(this.lfoGain);
-    this.lfoGain.connect(this.oscillator.frequency);
-
-    this.gainNode.gain.setValueAtTime(0, this.audioCtx!.currentTime);
-    this.gainNode.gain.linearRampToValueAtTime(0.2, this.audioCtx!.currentTime + 0.1);
-
-    this.oscillator.connect(this.gainNode);
-    this.gainNode.connect(this.audioCtx!.destination);
-    
-    this.lfo.start();
-    this.oscillator.start();
-    return Promise.resolve();
-  }
-
-  pause() {
-    if (!this.isPlaying) return;
-    this.isPlaying = false;
-    
-    if (this.gainNode && this.audioCtx && this.oscillator) {
-      try {
-        this.gainNode.gain.linearRampToValueAtTime(0, this.audioCtx.currentTime + 0.1);
-        const osc = this.oscillator;
-        const lfo = this.lfo;
-        const gain = this.gainNode;
-        setTimeout(() => {
-          try {
-            osc.stop();
-            lfo?.stop();
-            osc.disconnect();
-            lfo?.disconnect();
-            gain.disconnect();
-          } catch(e) {}
-        }, 150);
-      } catch(e) {}
-    }
-  }
-}
-
 export function DashboardAdmin() {
-  const [tab, setTab] = useState<'requests' | 'reports' | 'donations' | 'containers' | 'chat' | 'issues'>('requests');
+  const [tab, setTab] = useState<'requests' | 'reports' | 'donations' | 'containers' | 'chat' | 'issues' | 'products'>('requests');
   const [containers, setContainers] = useState<Container[]>([]);
   const [requests, setRequests] = useState<RequestItem[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const previousReportsRef = useRef<Report[]>([]);
-  const audioRef = useRef<any>(null);
   const [sirenPlaying, setSirenPlaying] = useState(false);
+
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const oscillatorRef1 = useRef<OscillatorNode | null>(null);
+  const oscillatorRef2 = useRef<OscillatorNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+  const intervalRef = useRef<any>(null);
+
+  const playSirenSound = () => {
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      
+      if (oscillatorRef1.current) return;
+      
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      // Testere dişi (sawtooth) ve kare (square) dalgalar ile gürültülü ve dikkat çekici bir ton
+      osc1.type = 'sawtooth';
+      osc2.type = 'square';
+      
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+      
+      gain.gain.value = 0.2; // Ses seviyesi (çok patlamaması için 0.2)
+      
+      osc1.start();
+      osc2.start();
+      
+      oscillatorRef1.current = osc1;
+      oscillatorRef2.current = osc2;
+      gainNodeRef.current = gain;
+      
+      // Klasik inip çıkan acil durum sireni (wailing siren)
+      const sweep = () => {
+        if (!oscillatorRef1.current || !oscillatorRef2.current || !ctx) return;
+        const t = ctx.currentTime;
+        
+        // Sesin yükselişi
+        osc1.frequency.setValueAtTime(600, t);
+        osc1.frequency.linearRampToValueAtTime(1200, t + 1.2);
+        osc2.frequency.setValueAtTime(590, t); // Sesi daha dolgun yapmak için hafif farklı frekans
+        osc2.frequency.linearRampToValueAtTime(1180, t + 1.2);
+        
+        // Sesin alçalışı
+        osc1.frequency.linearRampToValueAtTime(600, t + 2.4);
+        osc2.frequency.linearRampToValueAtTime(590, t + 2.4);
+      };
+
+      sweep();
+      intervalRef.current = setInterval(sweep, 2400); // 2.4 saniyede bir döngü
+    } catch (e) {
+      console.error('Audio setup failed:', e);
+    }
+  };
+
+  const stopSirenSound = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (oscillatorRef1.current) {
+      try { oscillatorRef1.current.stop(); } catch(e) {}
+      oscillatorRef1.current.disconnect();
+      oscillatorRef1.current = null;
+    }
+    if (oscillatorRef2.current) {
+      try { oscillatorRef2.current.stop(); } catch(e) {}
+      oscillatorRef2.current.disconnect();
+      oscillatorRef2.current = null;
+    }
+    if (gainNodeRef.current) {
+      gainNodeRef.current.disconnect();
+      gainNodeRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    if (sirenPlaying) {
+      playSirenSound();
+    } else {
+      stopSirenSound();
+    }
+    return () => stopSirenSound();
+  }, [sirenPlaying]);
+
+
+
+
 
   // Filters for containers
   const [containerSearch, setContainerSearch] = useState('');
+  const [productSearch, setProductSearch] = useState('');
+  const [criticalThresholds, setCriticalThresholds] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem('criticalStockThresholds');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [regionFilter, setRegionFilter] = useState('all');
   const [occupancyFilter, setOccupancyFilter] = useState('all');
   const [emergencyFilter, setEmergencyFilter] = useState('all');
@@ -108,11 +131,15 @@ export function DashboardAdmin() {
   const [children, setChildren] = useState('0');
   const [babies, setBabies] = useState('0');
   const [updateMessage, setUpdateMessage] = useState<{id: string, text: string, type: 'success' | 'error'} | null>(null);
+  const [revertPrompt, setRevertPrompt] = useState<{ id: string, type: 'request' | 'report' | 'donation' | 'issue', password: string } | null>(null);
+  const [pendingStocks, setPendingStocks] = useState<Record<string, string>>({});
+  const [pendingThresholds, setPendingThresholds] = useState<Record<string, string>>({});
+  const pendingIdsRef = useRef<Set<string>>(new Set());
 
   const loadData = async () => {
     try {
       const data = await api.get('/admin/dashboard');
-      const { containers: c, requests: rq, reports: rp, donations: d, products: prodRes, issues: iss } = data;
+      const { containers: c, requests: rq, reports: rp, donations: d, products: prodRes = [], issues: iss } = data;
       
       setContainers(c);
       
@@ -125,10 +152,24 @@ export function DashboardAdmin() {
 
       const enrichedReqs = rq.map((r: any) => ({ ...r, containerName: cMap.get(r.containerId) || 'Bilinmiyor', productName: pMap.get(r.productId) || 'Bilinmeyen Ürün' }));
       
-      setRequests(enrichedReqs);
-      setReports(rp);
-      setDonations(d);
-      setIssues(iss);
+      const preserveOptimistic = (serverArray: any[], prevArray: any[]) => {
+        const result = [];
+        for (const serverItem of serverArray) {
+          if (pendingIdsRef.current.has(serverItem.id)) {
+            const existing = prevArray.find(p => p.id === serverItem.id);
+            if (existing) result.push(existing);
+          } else {
+            result.push(serverItem);
+          }
+        }
+        return result;
+      };
+      
+      setRequests(prev => preserveOptimistic(enrichedReqs, prev));
+      setReports(prev => preserveOptimistic(rp, prev));
+      setDonations(prev => preserveOptimistic(d, prev));
+      setIssues(prev => preserveOptimistic(iss || [], prev));
+      setProducts(prodRes);
     } catch (e) {
       console.error(e);
     }
@@ -138,23 +179,21 @@ export function DashboardAdmin() {
     loadData();
     const interval = setInterval(loadData, 3000); // 3 seconds fast polling
     
-    audioRef.current = new SirenSynth();
-
     return () => {
       clearInterval(interval);
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
     };
   }, []);
 
   useEffect(() => {
-    const currentNew = reports.filter(r => r.status === 'new').length;
+    const newReports = reports.filter(r => r.status === 'new');
+    const currentNew = newReports.length;
     const prevNew = previousReportsRef.current.filter(r => r.status === 'new').length;
     
     if (currentNew > prevNew) {
-      if (audioRef.current) {
-        audioRef.current.play().catch(() => {}); // Might fail due to autoplay policies if user didn't interact
+      const mutedTimestamp = parseInt(localStorage.getItem('mutedSirenTimestamp') || '0', 10);
+      const latestTime = currentNew > 0 ? Math.max(...newReports.map(r => new Date(r.createdAt).getTime())) : 0;
+      
+      if (latestTime > mutedTimestamp) {
         setSirenPlaying(true);
       }
     } else if (currentNew === 0 && sirenPlaying) {
@@ -165,64 +204,96 @@ export function DashboardAdmin() {
   }, [reports]);
 
   const stopSiren = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setSirenPlaying(false);
+    setSirenPlaying(false);
+    
+    const newReports = reports.filter(r => r.status === 'new');
+    if (newReports.length > 0) {
+      const latestTime = Math.max(...newReports.map(r => new Date(r.createdAt).getTime()));
+      localStorage.setItem('mutedSirenTimestamp', latestTime.toString());
     }
   };
 
   const updateRequest = async (id: string, status: string) => {
+    pendingIdsRef.current.add(id);
+    const original = [...requests];
+    setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
     try {
       await api.put(`/requests/${id}`, { status });
-      loadData();
     } catch (e: any) {
+      setRequests(original);
       showToast("Hata oluştu: " + e.message, 'error');
+    } finally {
+      setTimeout(() => pendingIdsRef.current.delete(id), 4000);
     }
   };
 
   const updateDonation = async (id: string, status: string) => {
+    pendingIdsRef.current.add(id);
+    const original = [...donations];
+    setDonations(prev => prev.map(d => d.id === id ? { ...d, status } : d));
     try {
       await api.put(`/donations/${id}`, { status });
-      loadData();
     } catch (e: any) {
+      setDonations(original);
       showToast("Hata oluştu: " + e.message, 'error');
+    } finally {
+      setTimeout(() => pendingIdsRef.current.delete(id), 4000);
     }
   };
 
   const updateReport = async (id: string, status: string) => {
+    pendingIdsRef.current.add(id);
+    const original = [...reports];
+    setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r));
     try {
       await api.put(`/reports/${id}`, { status });
-      loadData();
     } catch (e: any) {
+      setReports(original);
       showToast("Hata oluştu: " + e.message, 'error');
+    } finally {
+      setTimeout(() => pendingIdsRef.current.delete(id), 4000);
     }
   };
 
   const deleteReport = async (id: string) => {
+    pendingIdsRef.current.add(id);
+    const original = [...reports];
+    setReports(prev => prev.filter(r => r.id !== id));
     try {
       await api.delete(`/reports/${id}`);
-      loadData();
     } catch (e: any) {
+      setReports(original);
       console.error("Hata oluştu: " + e.message);
+    } finally {
+      setTimeout(() => pendingIdsRef.current.delete(id), 4000);
     }
   };
 
   const deleteRequest = async (id: string) => {
+    pendingIdsRef.current.add(id);
+    const original = [...requests];
+    setRequests(prev => prev.filter(r => r.id !== id));
     try {
       await api.delete(`/requests/${id}`);
-      loadData();
     } catch (e: any) {
+      setRequests(original);
       console.error("Hata oluştu: " + e.message);
+    } finally {
+      setTimeout(() => pendingIdsRef.current.delete(id), 4000);
     }
   };
 
   const deleteDonation = async (id: string) => {
+    pendingIdsRef.current.add(id);
+    const original = [...donations];
+    setDonations(prev => prev.filter(d => d.id !== id));
     try {
       await api.delete(`/donations/${id}`);
-      loadData();
     } catch (e: any) {
+      setDonations(original);
       console.error("Hata oluştu: " + e.message);
+    } finally {
+      setTimeout(() => pendingIdsRef.current.delete(id), 4000);
     }
   };
 
@@ -254,20 +325,30 @@ export function DashboardAdmin() {
   };
 
   const updateIssue = async (id: string, status: string) => {
+    pendingIdsRef.current.add(id);
+    const original = [...issues];
+    setIssues(prev => prev.map(i => i.id === id ? { ...i, status } : i));
     try {
       await api.put(`/issues/${id}`, { status });
-      loadData();
     } catch (e: any) {
+      setIssues(original);
       showToast("Hata oluştu: " + e.message, 'error');
+    } finally {
+      setTimeout(() => pendingIdsRef.current.delete(id), 4000);
     }
   };
 
   const deleteIssue = async (id: string) => {
+    pendingIdsRef.current.add(id);
+    const original = [...issues];
+    setIssues(prev => prev.filter(i => i.id !== id));
     try {
       await api.delete(`/issues/${id}`);
-      loadData();
     } catch (e: any) {
+      setIssues(original);
       console.error("Hata oluştu: " + e.message);
+    } finally {
+      setTimeout(() => pendingIdsRef.current.delete(id), 4000);
     }
   };
 
@@ -278,6 +359,29 @@ export function DashboardAdmin() {
     } catch (e: any) {
       console.error("Hata oluştu: " + e.message);
     }
+  };
+
+  const handleRevertStatus = (id: string, type: 'request' | 'report' | 'donation' | 'issue') => {
+    setRevertPrompt({ id, type, password: '' });
+  };
+
+  const submitRevertStatus = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!revertPrompt) return;
+    
+    if (revertPrompt.password !== "adminukis2026") {
+      showToast("Şifre hatalı. İşlem iptal edildi.", "error");
+      setRevertPrompt(null);
+      return;
+    }
+    
+    if (revertPrompt.type === 'request') updateRequest(revertPrompt.id, 'pending');
+    else if (revertPrompt.type === 'report') updateReport(revertPrompt.id, 'new');
+    else if (revertPrompt.type === 'donation') updateDonation(revertPrompt.id, 'pending');
+    else if (revertPrompt.type === 'issue') updateIssue(revertPrompt.id, 'pending');
+    
+    showToast("İşlem geri alındı, yeniden değerlendirebilirsiniz.", "success");
+    setRevertPrompt(null);
   };
 
   const addContainer = async (e: React.FormEvent) => {
@@ -332,6 +436,28 @@ export function DashboardAdmin() {
     }
   };
 
+  const toggleProductStock = async (id: string, currentStock: boolean) => {
+    try {
+      await api.put(`/products/${id}/stock`, { inStock: !currentStock });
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, inStock: !currentStock } : p));
+      showToast('Stok durumu güncellendi.', 'success');
+    } catch (e: any) {
+      showToast("Hata oluştu: " + e.message, 'error');
+    }
+  };
+
+  const updateProductStockQuantity = async (id: string, quantity: number, sizesStock?: Record<string, number>) => {
+    try {
+      const payload: any = { stockQuantity: quantity };
+      if (sizesStock) payload.sizesStock = sizesStock;
+      await api.put(`/products/${id}/stock`, payload);
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, stockQuantity: quantity, sizesStock: sizesStock ?? p.sizesStock } : p));
+      showToast('Stok güncellenmiştir.', 'success');
+    } catch (e: any) {
+      showToast("Hata oluştu: " + e.message, 'error');
+    }
+  };
+
   const uniqueRegions = Array.from(new Set(containers.map(c => {
     const match = (c.containerFullId || '').match(/^[A-Za-z]+/);
     return match ? match[0].toUpperCase() : '';
@@ -370,8 +496,27 @@ export function DashboardAdmin() {
     return true;
   });
 
+  const criticalStocks = products.filter(p => (p.stockQuantity ?? 100) <= (criticalThresholds[p.id] ?? 50));
+
   return (
     <div className="space-y-6">
+      {criticalStocks.length > 0 && (
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/50 p-4 rounded-xl flex items-start gap-3 shadow-sm">
+          <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-bold text-red-800 dark:text-red-300 text-[14px]">Kritik Stok Uyarısı</h4>
+            <p className="text-[13px] text-red-700 dark:text-red-400 mt-1">Aşağıdaki ürünlerin stoku belirlenen kritik seviyenin altına düşmüştür veya bu değere eşittir:</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {criticalStocks.map(p => (
+                <button key={p.id} onClick={() => setTab('products')} className="bg-white/60 dark:bg-slate-800/60 border border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-400 px-2 py-1 rounded text-xs font-semibold hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors">
+                  {p.name} (Stok: {p.stockQuantity ?? 0} / Sınır: {criticalThresholds[p.id] ?? 50})
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex gap-4 border-b border-slate-200 overflow-x-auto no-scrollbar items-center justify-between">
         <div className="flex gap-4">
           <button className={`pb-3 font-semibold text-[13px] whitespace-nowrap ${tab === 'requests' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-500'}`} onClick={() => setTab('requests')}>
@@ -389,6 +534,9 @@ export function DashboardAdmin() {
           <button className={`pb-3 font-semibold text-[13px] whitespace-nowrap ${tab === 'issues' ? 'text-orange-600 border-b-2 border-orange-600' : 'text-slate-500'}`} onClick={() => setTab('issues')}>
             Özel İhtiyaçlar ve Şikayetler ({issues.filter(i => i.status === 'pending').length})
           </button>
+          <button className={`pb-3 font-semibold text-[13px] whitespace-nowrap ${tab === 'products' ? 'text-emerald-600 border-b-2 border-emerald-600' : 'text-slate-500'}`} onClick={() => setTab('products')}>
+            Ürün & Stok
+          </button>
           <button className={`pb-3 font-semibold text-[13px] whitespace-nowrap ${tab === 'chat' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-500'}`} onClick={() => setTab('chat')}>
             Canlı Destek
           </button>
@@ -401,10 +549,10 @@ export function DashboardAdmin() {
 
       {sirenPlaying && (
         <div className="bg-red-600 text-white p-4 rounded-xl flex justify-between items-center animate-pulse shadow-lg mt-4 mb-4">
-          <div className="font-bold">⚠️ YENİ ACİL BİLDİRİM(LER) GELDİ!</div>
+          <div className="font-bold">⚠️ YENİ ACİL BİLDİRİM!</div>
           <button onClick={() => { stopSiren(); setTab('reports'); }} className="bg-white text-red-600 font-bold px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-100">
             <BellOff className="w-5 h-5" />
-            Sesi Sustur & İncele
+            İkazı Kapat & İncele
           </button>
         </div>
       )}
@@ -426,6 +574,15 @@ export function DashboardAdmin() {
             <div key={r.id} className="bg-white dark:bg-slate-800 border text-[13px] border-slate-200 dark:border-slate-700 rounded-xl p-4 flex items-center justify-between shadow-sm">
               <div>
                 <div className="font-bold text-slate-800 dark:text-slate-100">{r.containerName} - {r.productName} ({r.quantity} adet)</div>
+                {(r.size || r.age) && (
+                  <div className="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-1">
+                    {r.size && <span>Beden: {r.size} </span>}
+                    {r.age && <span>Yaş: {r.age} </span>}
+                  </div>
+                )}
+                {r.notes && (
+                  <div className="text-xs text-slate-600 dark:text-slate-300 mt-1">{r.notes}</div>
+                )}
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">{new Date(r.createdAt).toLocaleString('tr-TR')}</div>
               </div>
               <div className="flex gap-2">
@@ -435,9 +592,12 @@ export function DashboardAdmin() {
                     <button onClick={() => updateRequest(r.id, 'rejected')} className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700">Reddet</button>
                   </>
                 ) : (
-                  <span className={`px-2 py-1 font-bold rounded-md flex items-center gap-2 ${r.status === 'approved' || r.status === 'fulfilled' || r.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : r.status === 'cancelled' ? 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
-                    {r.status === 'approved' ? 'KARŞILANDI' : r.status === 'rejected' ? 'REDDEDİLDİ' : r.status === 'fulfilled' ? 'KARŞILANDI' : r.status === 'delivered' ? 'TESLİM EDİLDİ' : r.status === 'cancelled' ? 'İPTAL EDİLDİ' : (r.status || '').toUpperCase()}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-3 py-1.5 font-bold rounded-md flex items-center gap-2 ${r.status === 'approved' || r.status === 'fulfilled' || r.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : r.status === 'cancelled' ? 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                      {r.status === 'approved' ? 'KARŞILANDI' : r.status === 'rejected' ? 'REDDEDİLDİ' : r.status === 'fulfilled' ? 'KARŞILANDI' : r.status === 'delivered' ? 'TESLİM EDİLDİ' : r.status === 'cancelled' ? 'İPTAL EDİLDİ' : (r.status || '').toUpperCase()}
+                    </span>
+                    <button onClick={() => handleRevertStatus(r.id, 'request')} className="px-3 py-1.5 bg-amber-100 text-amber-700 hover:bg-amber-200 font-bold rounded-lg transition" title="Durumu Düzenle">Düzenle</button>
+                  </div>
                 )}
                 <button onClick={() => deleteRequest(r.id)} className="px-2 text-red-400 hover:text-red-600 transition" title="Sil">
                   <Trash2 className="w-4 h-4" />
@@ -472,9 +632,12 @@ export function DashboardAdmin() {
                       <button onClick={() => updateReport(r.id, 'rejected')} className="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600">Asılsız İhbar</button>
                     </>
                   ) : (
-                    <span className={`px-2 py-1 font-bold rounded-md flex items-center gap-2 ${r.status === 'dispatched' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'}`}>
-                      {r.status === 'dispatched' ? '✅ YÖNLENDİRİLDİ' : r.status === 'rejected' ? '❌ ASILSIZ İHBAR' : (r.status || '').toUpperCase()}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1.5 font-bold rounded-md flex items-center gap-2 ${r.status === 'dispatched' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'}`}>
+                        {r.status === 'dispatched' ? '✅ YÖNLENDİRİLDİ' : r.status === 'rejected' ? '❌ ASILSIZ İHBAR' : (r.status || '').toUpperCase()}
+                      </span>
+                      <button onClick={() => handleRevertStatus(r.id, 'report')} className="px-3 py-1.5 bg-amber-100 text-amber-700 hover:bg-amber-200 font-bold rounded-lg transition" title="Durumu Düzenle">Düzenle</button>
+                    </div>
                   )}
                   <button onClick={() => deleteReport(r.id)} className="px-2 text-red-400 hover:text-red-600 transition" title="Sil">
                     <Trash2 className="w-4 h-4" />
@@ -518,9 +681,12 @@ export function DashboardAdmin() {
                       <button onClick={() => updateDonation(d.id, 'rejected')} className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700">Reddet</button>
                     </>
                   ) : (
-                    <span className={`px-2 py-1 font-bold rounded-md flex items-center gap-2 ${d.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : d.status === 'rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : d.status === 'cancelled' ? 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}`}>
-                      {d.status === 'approved' ? 'KARŞILANDI' : d.status === 'rejected' ? 'REDDEDİLDİ' : d.status === 'cancelled' ? 'İPTAL EDİLDİ' : (d.status || '').toUpperCase()}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1.5 font-bold rounded-md flex items-center gap-2 ${d.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : d.status === 'rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : d.status === 'cancelled' ? 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}`}>
+                        {d.status === 'approved' ? 'KARŞILANDI' : d.status === 'rejected' ? 'REDDEDİLDİ' : d.status === 'cancelled' ? 'İPTAL EDİLDİ' : (d.status || '').toUpperCase()}
+                      </span>
+                      <button onClick={() => handleRevertStatus(d.id, 'donation')} className="px-3 py-1.5 bg-amber-100 text-amber-700 hover:bg-amber-200 font-bold rounded-lg transition" title="Durumu Düzenle">Düzenle</button>
+                    </div>
                   )}
                   <button onClick={() => deleteDonation(d.id)} className="px-2 text-red-400 hover:text-red-600 transition" title="Sil">
                     <Trash2 className="w-4 h-4" />
@@ -576,9 +742,12 @@ export function DashboardAdmin() {
                       <button onClick={() => updateIssue(i.id, 'rejected')} className="px-4 py-2 bg-red-100 text-red-700 font-bold rounded-lg hover:bg-red-200 transition">Onaylanmadı</button>
                     </>
                   ) : (
-                    <span className={`px-3 py-1.5 font-bold rounded-lg ${i.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                      {i.status === 'resolved' ? 'Karşılandı' : 'Onaylanmadı'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-4 py-2 font-bold rounded-lg ${i.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                        {i.status === 'resolved' ? 'Karşılandı' : 'Onaylanmadı'}
+                      </span>
+                      <button onClick={() => handleRevertStatus(i.id, 'issue')} className="px-4 py-2 bg-amber-100 text-amber-700 hover:bg-amber-200 font-bold rounded-lg transition" title="Durumu Düzenle">Düzenle</button>
+                    </div>
                   )}
                   <button onClick={() => deleteIssue(i.id)} className="px-2 text-red-400 hover:text-red-600 transition" title="Sil">
                     <Trash2 className="w-4 h-4" />
@@ -678,6 +847,210 @@ export function DashboardAdmin() {
                 </form>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {tab === 'products' && (
+        <div className="space-y-4">
+          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm mb-4">
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-2">Ürün ve Stok Yönetimi</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Ürünlerin afetzedeler için sipariş edilebilir durumunu yönetin.</p>
+            
+            <div className="relative max-w-md">
+              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Ürün adı veya kategori ile ara..." 
+                value={productSearch}
+                onChange={e => setProductSearch(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-blue-500 dark:text-slate-200 transition-colors"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products
+              .filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase()) || p.category.toLowerCase().includes(productSearch.toLowerCase()))
+              .map(p => (
+              <div key={p.id} className="bg-white dark:bg-slate-800 border text-[13px] border-slate-200 dark:border-slate-700 rounded-xl p-4 flex flex-col gap-3 shadow-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                      {p.name}
+                      {(p.stockQuantity ?? 100) <= (criticalThresholds[p.id] ?? 50) && (
+                        <span className="bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" /> Kritik
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-slate-500">{p.mainCategory} &gt; {p.category}</div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 mt-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50 px-2 py-1 rounded">
+                      <AlertTriangle className="w-3 h-3 text-red-600 dark:text-red-400" />
+                      <span className="text-[10px] font-bold text-red-800 dark:text-red-300 uppercase">Kritik Sınır:</span>
+                      <input 
+                        type="number"
+                        min="0"
+                        className="w-12 bg-white dark:bg-slate-800 border border-red-200 dark:border-red-800/50 rounded px-1 py-0.5 text-[11px] text-center font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-red-500"
+                        value={pendingThresholds[p.id] !== undefined ? pendingThresholds[p.id] : (criticalThresholds[p.id] ?? 50).toString()}
+                        onChange={(e) => {
+                          let val = e.target.value;
+                          if (val.length > 1) {
+                             val = val.replace(/^0+(?=\d)/, '');
+                          }
+                          setPendingThresholds(prev => ({...prev, [p.id]: val}));
+                        }}
+                      />
+                      <button 
+                        onClick={() => {
+                          const val = parseInt(pendingThresholds[p.id]);
+                          if (!isNaN(val)) {
+                            setCriticalThresholds(prev => {
+                              const updated = { ...prev, [p.id]: val };
+                              localStorage.setItem('criticalStockThresholds', JSON.stringify(updated));
+                              return updated;
+                            });
+                          }
+                          const newThresholds = { ...pendingThresholds };
+                          delete newThresholds[p.id];
+                          setPendingThresholds(newThresholds);
+                        }}
+                        className={`ml-1 px-1.5 py-0.5 bg-red-600 text-white text-[9px] uppercase font-bold rounded hover:bg-red-700 transition-colors ${
+                          (pendingThresholds[p.id] !== undefined && pendingThresholds[p.id] !== (criticalThresholds[p.id] ?? 50).toString()) ? 'inline-block' : 'hidden'
+                        }`}
+                      >
+                        Kaydet
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <div className={`px-2 py-1 text-xs font-bold rounded-md ${p.inStock ?? true ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                      {p.inStock ?? true ? '✅ Stokta Var' : '❌ Stok Kapalı'}
+                    </div>
+                    <button 
+                      onClick={() => toggleProductStock(p.id, p.inStock ?? true)}
+                      className="px-3 py-1 text-xs font-bold rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 transition-colors"
+                    >
+                      {p.inStock ?? true ? 'Stoğu Kapat' : 'Stoğa Aç'}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-grow bg-slate-50 dark:bg-slate-700 p-2 rounded-lg border border-slate-100 dark:border-slate-600 mt-1">
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Stok:</span>
+                    <input 
+                      type="number" 
+                      min="0"
+                      className="w-16 bg-transparent border-b border-slate-300 dark:border-slate-500 focus:outline-none focus:border-blue-500 text-center font-bold text-slate-700 dark:text-slate-200"
+                      value={pendingStocks[p.id] !== undefined ? pendingStocks[p.id] : (p.stockQuantity ?? 100).toString()}
+                      onChange={(e) => {
+                        let val = e.target.value;
+                        if (val.length > 1) {
+                           val = val.replace(/^0+(?=\d)/, '');
+                        }
+                        setPendingStocks(prev => ({...prev, [p.id]: val}));
+                      }}
+                    />
+                    <button 
+                      onClick={() => {
+                        const val = parseInt(pendingStocks[p.id]);
+                        if (!isNaN(val)) {
+                          updateProductStockQuantity(p.id, val);
+                        } else {
+                          updateProductStockQuantity(p.id, 0);
+                        }
+                        const newStocks = { ...pendingStocks };
+                        delete newStocks[p.id];
+                        setPendingStocks(newStocks);
+                      }}
+                      className={`ml-auto px-2 py-1 bg-blue-600 text-white text-[10px] uppercase tracking-wider font-bold rounded hover:bg-blue-700 transition-colors ${
+                        (pendingStocks[p.id] !== undefined && pendingStocks[p.id] !== (p.stockQuantity ?? 100).toString()) ? 'visible' : 'invisible'
+                      }`}
+                    >
+                      Değişikliği Onayla
+                    </button>
+                  </div>
+                  {p.mainCategory === 'Giyim' && (
+                    <div className="flex flex-col gap-2 mt-1 bg-slate-50 dark:bg-slate-700 p-2 rounded-lg border border-slate-100 dark:border-slate-600">
+                      <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Beden Stokları:</div>
+                      <div className="grid grid-cols-3 gap-2">
+                        {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map(size => {
+                          const sizeKey = `${p.id}_size_${size}`;
+                          const currentSizeStock = p.sizesStock?.[size] ?? 0;
+                          const displayValue = pendingStocks[sizeKey] !== undefined ? pendingStocks[sizeKey] : currentSizeStock.toString();
+                          return (
+                            <div key={size} className="flex items-center justify-between gap-1 text-[11px]">
+                              <span className="font-bold text-slate-600 dark:text-slate-300 w-6">{size}:</span>
+                              <input 
+                                type="number"
+                                min="0"
+                                className="w-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded px-1 text-center font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                                value={displayValue}
+                                onChange={e => {
+                                  let val = e.target.value;
+                                  if (val.length > 1) val = val.replace(/^0+(?=\d)/, '');
+                                  setPendingStocks(prev => ({...prev, [sizeKey]: val}));
+                                }}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <button 
+                        onClick={() => {
+                          const newSizesStock = { ...(p.sizesStock || {}) };
+                          ['XS', 'S', 'M', 'L', 'XL', 'XXL'].forEach(size => {
+                             const sizeKey = `${p.id}_size_${size}`;
+                             if (pendingStocks[sizeKey] !== undefined) {
+                               const val = parseInt(pendingStocks[sizeKey]);
+                               newSizesStock[size] = isNaN(val) ? 0 : val;
+                             }
+                          });
+                          const totalStock = Object.values(newSizesStock).reduce((a, b) => a + (b as number), 0);
+                          updateProductStockQuantity(p.id, totalStock, newSizesStock);
+                          
+                          const newStocks = { ...pendingStocks };
+                          ['XS', 'S', 'M', 'L', 'XL', 'XXL'].forEach(size => delete newStocks[`${p.id}_size_${size}`]);
+                          delete newStocks[p.id];
+                          setPendingStocks(newStocks);
+                        }}
+                        className={`mt-2 w-full px-2 py-1 bg-blue-600 text-white text-[10px] uppercase tracking-wider font-bold rounded hover:bg-blue-700 transition-colors ${
+                          ['XS', 'S', 'M', 'L', 'XL', 'XXL'].some(s => pendingStocks[`${p.id}_size_${s}`] !== undefined && pendingStocks[`${p.id}_size_${s}`] !== (p.sizesStock?.[s] ?? 0).toString()) ? 'block' : 'hidden'
+                        }`}
+                      >
+                        Bedenleri ve Toplamı Güncelle
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {revertPrompt && (
+        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Görevli Doğrulaması</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">İşlemi geri almak için görevli şifresini giriniz:</p>
+            <form onSubmit={submitRevertStatus}>
+              <input
+                type="password"
+                required
+                autoFocus
+                className="w-full p-3 border dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white outline-none focus:border-blue-500 mb-4"
+                value={revertPrompt.password}
+                onChange={e => setRevertPrompt({ ...revertPrompt, password: e.target.value })}
+                placeholder="Şifre"
+              />
+              <div className="flex gap-2 justify-end">
+                <button type="button" onClick={() => setRevertPrompt(null)} className="px-4 py-2 bg-slate-100 text-slate-600 font-bold rounded-lg hover:bg-slate-200">İptal</button>
+                <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">Onayla</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
