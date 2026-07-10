@@ -119,7 +119,7 @@ export function DashboardDonor({ user }: { user: UserSession }) {
         fulfilledRequests: Array.from(selected),
         status: 'pending'
       });
-      showToast('Talebiniz Yetkiliye İletildi.', 'success');
+      showToast('Talebiniz Görevliye İletildi.', 'success');
       setSelected(new Set());
       setShowConfirm(false);
       setPhone('');
@@ -161,7 +161,7 @@ export function DashboardDonor({ user }: { user: UserSession }) {
         description: desc,
         status: 'pending'
       });
-      showToast('Talebiniz Yetkiliye İletildi.', 'success');
+      showToast('Talebiniz Görevliye İletildi.', 'success');
       setDesc('');
       setPhone('');
       loadRequests();
@@ -202,7 +202,7 @@ export function DashboardDonor({ user }: { user: UserSession }) {
               <textarea value={desc} onChange={e => setDesc(e.target.value)} required className="w-full p-4 border border-slate-300 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-[150px] text-sm focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none" placeholder="Örn: 50 koli kışlık giyim..." />
             </div>
             <button type="submit" disabled={loading || !desc.trim()} className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md disabled:opacity-50">
-              {loading ? "Gönderiliyor..." : "Bağış Bildirimini Yetkiliye İlet"}
+              {loading ? "Gönderiliyor..." : "Bağış Bildirimini Görevliye İlet"}
             </button>
           </form>
         </div>
@@ -282,7 +282,7 @@ export function DashboardDonor({ user }: { user: UserSession }) {
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col gap-5">
               <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">İletişim Bilgileri</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Yetkililerin sizinle iletişime geçip bağışı teslim alabilmesi için iletişim bilgilerinizi giriniz.</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Görevlilerin sizinle iletişime geçip bağışı teslim alabilmesi için iletişim bilgilerinizi giriniz.</p>
               <form onSubmit={submitBireysel} className="flex flex-col gap-4">
                 <label className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Telefon Numarası</span>
