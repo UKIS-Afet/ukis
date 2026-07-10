@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Splash } from './components/Splash';
 import { Login } from './components/Login';
 import { VoiceReport } from './components/VoiceReport';
@@ -68,7 +68,10 @@ function MainApp() {
   const [showHelpGuide, setShowHelpGuide] = useState(false);
 
   useEffect(() => {
-    // Fetch product catalog on load
+    refreshProducts();
+  }, []);
+
+  const refreshProducts = useCallback(() => {
     api.get('/products').then(setProducts).catch(console.error);
   }, []);
 
@@ -133,12 +136,12 @@ function MainApp() {
               )}
               {user.role === 'yetkili' && (
                 <span className="hidden sm:inline text-xs font-semibold px-2 py-1 bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-md border border-red-100 dark:border-red-800">
-                  Yetkili Modu
+                  Görevli Modu
                 </span>
               )}
               {user.role === 'belediye' && (
                 <span className="hidden sm:inline text-xs font-semibold px-2 py-1 bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 rounded-md border border-amber-100 dark:border-amber-800">
-                  Belediye Başkanı
+                  Yetkili
                 </span>
               )}
               {(user.role === 'bagisci_bireysel' || user.role === 'bagisci_kurumsal') && (
@@ -174,7 +177,7 @@ function MainApp() {
                   <div className="w-5 h-5 rounded-full border border-amber-500 text-amber-500 flex items-center justify-center font-serif text-xs font-bold bg-amber-50 dark:bg-amber-900/30 shrink-0">i</div>
                   <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                     <strong className="text-slate-900 dark:text-slate-100 text-[13px] block mb-1">Hizmetlerimizden yararlanmak için lütfen giriş yapınız.</strong>
-                    Afetzede kodu, Bağışçı hesabı veya Yetkili şifresi ile tüm modüllere erişebilirsiniz.
+                    Afetzede kodu, Bağışçı hesabı veya Görevli şifresi ile tüm modüllere erişebilirsiniz.
                   </div>
                 </div>
                 <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-5 rounded-xl text-xs flex justify-between items-center shadow-md w-full max-w-[240px] transition" onClick={() => setShowLogin(true)}>
@@ -193,7 +196,7 @@ function MainApp() {
           </div>
         ) : (
           <div className="space-y-6">
-            {user.role === 'afetzede' && container && <DashboardVictim container={container} products={products} onProfileUpdate={setContainer} />}
+            {user.role === 'afetzede' && container && <DashboardVictim container={container} products={products} onProfileUpdate={setContainer} refreshProducts={refreshProducts} />}
             {user.role === 'yetkili' && <DashboardAdmin />}
             {user.role === 'belediye' && <DashboardBelediye user={user} />}
             {(user.role === 'bagisci_bireysel' || user.role === 'bagisci_kurumsal') && <DashboardDonor user={user} />}
