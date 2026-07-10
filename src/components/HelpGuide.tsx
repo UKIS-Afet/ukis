@@ -20,7 +20,7 @@ export function HelpGuide({ onClose }: { onClose: () => void }) {
               <UserCircle className="w-5 h-5 text-indigo-500" /> Sisteme Giriş
             </h3>
             <p className="text-sm leading-relaxed mb-2">
-              Sistemi kullanabilmek için sağ üstteki <strong>"Giriş Yap"</strong> butonunu kullanarak yetkinize uygun (Belediye Yetkilisi, AFAD, STK veya Bağışçı) şifrenizle giriş yapmalısınız. Giriş yapmadan yalnızca genel durumu ve afetzedeler için ayrılmış acil özellikleri (Acil Sesli Bildirim ve Canlı Destek) kullanabilirsiniz.
+              Sistemi kullanabilmek için sağ üstteki <strong>"Giriş Yap"</strong> butonunu kullanarak yetkinize uygun (Yetkili, Görevli, AFAD, STK veya Bağışçı) şifrenizle giriş yapmalısınız. Giriş yapmadan yalnızca genel durumu ve afetzedeler için ayrılmış acil özellikleri (Acil Sesli Bildirim ve Canlı Destek) kullanabilirsiniz.
             </p>
           </section>
 
@@ -38,21 +38,21 @@ export function HelpGuide({ onClose }: { onClose: () => void }) {
               <MessageCircle className="w-5 h-5 text-blue-500" /> Canlı Destek
             </h3>
             <p className="text-sm leading-relaxed mb-2">
-              Ekranın sağ alt köşesinde bulunan <strong>Canlı Destek</strong> butonu ile giriş yapmadan veya yaptıktan sonra doğrudan yetkili merkeze yazabilirsiniz. Karşılaştığınız sorunları yazabilir, dosya gönderebilirsiniz. <em>Lütfen saygı kuralları çerçevesinde kullanınız, aksi takdirde erişiminiz kısıtlanabilir.</em>
+              Ekranın sağ alt köşesinde bulunan <strong>Canlı Destek</strong> butonu ile giriş yapmadan veya yaptıktan sonra doğrudan görevli merkeze yazabilirsiniz. Karşılaştığınız sorunları yazabilir, dosya gönderebilirsiniz. <em>Lütfen saygı kuralları çerçevesinde kullanınız, aksi takdirde erişiminiz kısıtlanabilir.</em>
             </p>
           </section>
 
           <section>
             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">📦 Bağışçılar İçin</h3>
             <p className="text-sm leading-relaxed mb-2">
-              Bağışçı girişi yaptıktan sonra, bölgeye göndermek istediğiniz ayni yardımın detaylarını ve ulaşım tarihini sisteme girebilirsiniz. Yetkililer talebinizi inceleyip onaylayana kadar sevkiyat başlatmayınız.
+              Bağışçı girişi yaptıktan sonra, bölgeye göndermek istediğiniz ayni yardımın detaylarını ve ulaşım tarihini sisteme girebilirsiniz. Görevliler talebinizi inceleyip onaylayana kadar sevkiyat başlatmayınız.
             </p>
           </section>
           
           <section>
-            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">🏢 Yetkililer İçin (AFAD / Belediye)</h3>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">🏢 Görevliler ve Yetkililer İçin</h3>
             <p className="text-sm leading-relaxed mb-2">
-              Yetkili olarak giriş yaptığınızda, tüm bağışçı taleplerini inceleyebilir, onay/ret verebilir, konteyner durumlarını güncelleyebilir ve afetzedelerden gelen acil sesli bildirimleri dinleyebilirsiniz. Ayrıca Canlı Destek sekmesinden vatandaşlara yanıt verebilirsiniz.
+              Görevli veya Yetkili olarak giriş yaptığınızda, tüm bağışçı taleplerini inceleyebilir, onay/ret verebilir, konteyner durumlarını güncelleyebilir ve afetzedelerden gelen acil sesli bildirimleri dinleyebilirsiniz. Ayrıca Canlı Destek sekmesinden vatandaşlara yanıt verebilirsiniz.
             </p>
           </section>
         </div>
