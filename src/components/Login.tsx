@@ -63,8 +63,8 @@ export function Login({ onLogin, onClose }: LoginProps) {
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
           <button type="button" className={`flex-1 py-2 text-[10px] sm:text-[11px] font-bold rounded-lg ${role === 'afetzede' ? 'bg-white dark:bg-slate-700 text-[#1e3a6e] dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`} onClick={() => setRole('afetzede')}>Afetzede</button>
           <button type="button" className={`flex-1 py-2 text-[10px] sm:text-[11px] font-bold rounded-lg ${role === 'bagisci' ? 'bg-white dark:bg-slate-700 text-[#1e3a6e] dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`} onClick={() => setRole('bagisci')}>Bağışçı</button>
-          <button type="button" className={`flex-1 py-2 text-[10px] sm:text-[11px] font-bold rounded-lg ${role === 'yetkili' ? 'bg-white dark:bg-slate-700 text-[#1e3a6e] dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`} onClick={() => setRole('yetkili')}>Yetkili</button>
-          <button type="button" className={`flex-1 py-2 text-[10px] sm:text-[11px] font-bold rounded-lg ${role === 'belediye' ? 'bg-white dark:bg-slate-700 text-[#1e3a6e] dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`} onClick={() => setRole('belediye')}>Belediye</button>
+          <button type="button" className={`flex-1 py-2 text-[10px] sm:text-[11px] font-bold rounded-lg ${role === 'yetkili' ? 'bg-white dark:bg-slate-700 text-[#1e3a6e] dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`} onClick={() => setRole('yetkili')}>Görevli</button>
+          <button type="button" className={`flex-1 py-2 text-[10px] sm:text-[11px] font-bold rounded-lg ${role === 'belediye' ? 'bg-white dark:bg-slate-700 text-[#1e3a6e] dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'}`} onClick={() => setRole('belediye')}>Yetkili</button>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2">
@@ -94,20 +94,20 @@ export function Login({ onLogin, onClose }: LoginProps) {
 
           {role === 'yetkili' && (
             <>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Yönetici Şifreniz" required className="p-3 border border-slate-300 dark:border-slate-700 rounded-lg text-[13px] bg-slate-50 dark:bg-slate-900 focus:bg-white dark:focus:bg-slate-800 focus:border-[#1e3a6e] outline-none" />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Görevli Şifreniz" required className="p-3 border border-slate-300 dark:border-slate-700 rounded-lg text-[13px] bg-slate-50 dark:bg-slate-900 focus:bg-white dark:focus:bg-slate-800 focus:border-[#1e3a6e] outline-none" />
             </>
           )}
 
           {role === 'belediye' && (
             <>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Belediye Şifreniz" required className="p-3 border border-slate-300 dark:border-slate-700 rounded-lg text-[13px] bg-slate-50 dark:bg-slate-900 focus:bg-white dark:focus:bg-slate-800 focus:border-[#1e3a6e] outline-none" />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Yetkili Şifreniz" required className="p-3 border border-slate-300 dark:border-slate-700 rounded-lg text-[13px] bg-slate-50 dark:bg-slate-900 focus:bg-white dark:focus:bg-slate-800 focus:border-[#1e3a6e] outline-none" />
             </>
           )}
 
           {error && <div className="text-red-500 dark:text-red-400 text-xs font-medium bg-red-50 dark:bg-red-900/30 p-2 rounded-md">{error}</div>}
 
           <button disabled={loading} type="submit" className="bg-[#1e3a6e] dark:bg-blue-600 hover:bg-[#152e5a] dark:hover:bg-blue-700 text-white p-3 rounded-lg font-bold text-[13px]">
-            {loading ? "Yükleniyor..." : role === 'yetkili' ? "Yönetim Odasına Bağlan" : role === 'belediye' ? "Başkanlık Paneli'ne Gir" : role === 'bagisci' ? "Bağışçı Portalı'na Gir" : "Konteyner Doğrulaması Yap"}
+            {loading ? "Yükleniyor..." : role === 'yetkili' ? "Görevli Odasına Bağlan" : role === 'belediye' ? "Yetkili Paneli'ne Gir" : role === 'bagisci' ? "Bağışçı Portalı'na Gir" : "Konteyner Doğrulaması Yap"}
           </button>
         </form>
       </div>
