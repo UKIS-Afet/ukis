@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, boolean, serial } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, integer, boolean, serial, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const containers = pgTable('containers', {
@@ -26,6 +26,9 @@ export const products = pgTable('products', {
   maxPerChild: integer('max_per_child').notNull().default(0),
   maxPerBaby: integer('max_per_baby').notNull().default(0),
   cooldownHours: integer('cooldown_hours').notNull().default(0),
+  inStock: boolean('in_stock').notNull().default(true),
+  stockQuantity: integer('stock_quantity').notNull().default(100),
+  sizesStock: jsonb('sizes_stock').$type<Record<string, number>>(),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -37,6 +40,8 @@ export const requests = pgTable('requests', {
   status: text('status').notNull(), // 'pending', 'approved', 'rejected', 'delivered'
   requestDate: timestamp('request_date').notNull(),
   notes: text('notes'),
+  size: text('size'),
+  age: text('age'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
