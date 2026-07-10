@@ -22,6 +22,9 @@ export interface Product {
   maxPerChild: number;
   maxPerBaby: number;
   cooldownHours: number;
+  inStock?: boolean;
+  stockQuantity?: number;
+  sizesStock?: Record<string, number>;
 }
 
 export interface RequestItem {
@@ -32,6 +35,8 @@ export interface RequestItem {
   productName: string;
   quantity: number;
   status: 'pending' | 'approved' | 'rejected' | 'delivered' | 'fulfilled';
+  size?: string;
+  age?: string;
   createdAt: string;
 }
 
