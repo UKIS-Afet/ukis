@@ -278,7 +278,7 @@ export function LiveChat() {
             {isBanned && (
               <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 p-3 rounded-xl text-sm flex items-start gap-2 border border-red-200 dark:border-red-800">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <p>Canlı destek hattından yasaklandınız, yetkili merkez ile görüşün.</p>
+                <p>Canlı destek hattından yasaklandınız, görevli merkez ile görüşün.</p>
               </div>
             )}
             <div ref={messagesEndRef} />
