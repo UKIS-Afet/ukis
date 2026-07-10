@@ -34,14 +34,14 @@ const SEED_PRODUCTS = [
   { id: "bebek-bezi", name: "Bebek Bezi", unit: "Paket", mainCategory: "Hijyen", category: "Bebek İhtiyaç", icon: "Baby", imageUrl: "https://i.hizliresim.com/pwjrp7t.jpg", maxPerAdult: 0, maxPerChild: 0, maxPerBaby: 2, cooldownHours: 168 },
   { id: "kadin-pedi", name: "Kadın Pedi", unit: "Paket", mainCategory: "Hijyen", category: "Kişisel Bakım", icon: "Sparkles", imageUrl: "https://i.hizliresim.com/in9rfnj.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 168 },
 
-  { id: "kadin-ust-giyim", name: "Kadın Üst Giyim", unit: "Adet", mainCategory: "Giyim", category: "Kadın Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/r48ldi3.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720 },
-  { id: "kadin-ic-giyim", name: "Kadın İç Giyim", unit: "Adet", mainCategory: "Giyim", category: "Kadın Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/kq2uklu.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720 },
-  { id: "kadin-alt-giyim", name: "Kadın Alt Giyim", unit: "Adet", mainCategory: "Giyim", category: "Kadın Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/24gjvph.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720 },
-  { id: "erkek-ust-giyim", name: "Erkek Üst Giyim", unit: "Adet", mainCategory: "Giyim", category: "Erkek Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/q2bstdo.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720 },
-  { id: "erkek-ic-giyim", name: "Erkek İç Giyim", unit: "Adet", mainCategory: "Giyim", category: "Erkek Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/bxqq4mv.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720 },
-  { id: "erkek-alt-giyim", name: "Erkek Alt Giyim", unit: "Adet", mainCategory: "Giyim", category: "Erkek Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/thho1bb.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720 },
-  { id: "cocuk-giyim-paketi", name: "Çocuk Giyim Paketi", unit: "Paket", mainCategory: "Giyim", category: "Çocuk Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/ash6ab0.png", maxPerAdult: 0, maxPerChild: 1, maxPerBaby: 0, cooldownHours: 720 },
-  { id: "bebek-giyim-paketi", name: "Bebek Giyim Paketi", unit: "Paket", mainCategory: "Giyim", category: "Bebek Giyim", icon: "Baby", imageUrl: "https://i.hizliresim.com/2j2m8ap.png", maxPerAdult: 0, maxPerChild: 0, maxPerBaby: 1, cooldownHours: 720 }
+  { id: "kadin-ust-giyim", name: "Kadın Üst Giyim", unit: "Adet", mainCategory: "Giyim", category: "Kadın Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/r48ldi3.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720, sizesStock: { XS: 10, S: 20, M: 30, L: 25, XL: 10, XXL: 5 } },
+  { id: "kadin-ic-giyim", name: "Kadın İç Giyim", unit: "Adet", mainCategory: "Giyim", category: "Kadın Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/kq2uklu.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720, sizesStock: { XS: 10, S: 20, M: 30, L: 25, XL: 10, XXL: 5 } },
+  { id: "kadin-alt-giyim", name: "Kadın Alt Giyim", unit: "Adet", mainCategory: "Giyim", category: "Kadın Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/24gjvph.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720, sizesStock: { XS: 10, S: 20, M: 30, L: 25, XL: 10, XXL: 5 } },
+  { id: "erkek-ust-giyim", name: "Erkek Üst Giyim", unit: "Adet", mainCategory: "Giyim", category: "Erkek Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/q2bstdo.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720, sizesStock: { XS: 10, S: 20, M: 30, L: 25, XL: 10, XXL: 5 } },
+  { id: "erkek-ic-giyim", name: "Erkek İç Giyim", unit: "Adet", mainCategory: "Giyim", category: "Erkek Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/bxqq4mv.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720, sizesStock: { XS: 10, S: 20, M: 30, L: 25, XL: 10, XXL: 5 } },
+  { id: "erkek-alt-giyim", name: "Erkek Alt Giyim", unit: "Adet", mainCategory: "Giyim", category: "Erkek Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/thho1bb.png", maxPerAdult: 1, maxPerChild: 0, maxPerBaby: 0, cooldownHours: 720, sizesStock: { XS: 10, S: 20, M: 30, L: 25, XL: 10, XXL: 5 } },
+  { id: "cocuk-giyim-paketi", name: "Çocuk Giyim Paketi", unit: "Paket", mainCategory: "Giyim", category: "Çocuk Giyim", icon: "Shirt", imageUrl: "https://i.hizliresim.com/ash6ab0.png", maxPerAdult: 0, maxPerChild: 1, maxPerBaby: 0, cooldownHours: 720, sizesStock: { XS: 10, S: 20, M: 30, L: 25, XL: 10, XXL: 5 } },
+  { id: "bebek-giyim-paketi", name: "Bebek Giyim Paketi", unit: "Paket", mainCategory: "Giyim", category: "Bebek Giyim", icon: "Baby", imageUrl: "https://i.hizliresim.com/2j2m8ap.png", maxPerAdult: 0, maxPerChild: 0, maxPerBaby: 1, cooldownHours: 720, sizesStock: { XS: 10, S: 20, M: 30, L: 25, XL: 10, XXL: 5 } }
 ];
 
 const SEED_CONTAINERS = [
@@ -145,8 +145,23 @@ async function startServer() {
 
   app.get("/api/products", async (req, res) => {
     try {
-      const allProducts = await db.select().from(products);
+      const allProducts = await db.select().from(products).orderBy(products.createdAt, products.id);
       res.json(allProducts);
+    } catch (err) {
+      console.error(err); res.status(500).json({ error: "Veritabanı hatası", details: err?.message || String(err) });
+    }
+  });
+
+  app.put("/api/products/:id/stock", async (req, res) => {
+    try {
+      const { inStock, stockQuantity, sizesStock } = req.body;
+      const updateData: any = {};
+      if (inStock !== undefined) updateData.inStock = inStock;
+      if (stockQuantity !== undefined) updateData.stockQuantity = stockQuantity;
+      if (sizesStock !== undefined) updateData.sizesStock = sizesStock;
+      
+      const result = await db.update(products).set(updateData).where(eq(products.id, req.params.id)).returning();
+      result.length > 0 ? res.json(result[0]) : res.status(404).json({ message: "Bulunamadı" });
     } catch (err) {
       console.error(err); res.status(500).json({ error: "Veritabanı hatası", details: err?.message || String(err) });
     }
@@ -186,18 +201,29 @@ async function startServer() {
 
   app.get("/api/admin/dashboard", async (req, res) => {
     try {
-      const c = await db.select().from(containers);
-      const rq = await db.select().from(requests).orderBy(desc(requests.createdAt));
-      const rp = await db.select().from(reports).orderBy(desc(reports.createdAt));
-      const d = await db.select().from(donations).orderBy(desc(donations.createdAt));
-      const prodRes = await db.select().from(products);
-      const iss = await db.select().from(issues).orderBy(desc(issues.createdAt));
+      const c = await db.select().from(containers).orderBy(containers.containerFullId, containers.id);
+      const rq = await db.select().from(requests).orderBy(desc(requests.createdAt), requests.id);
+      const rp = await db.select().from(reports).orderBy(desc(reports.createdAt), reports.id);
+      const d = await db.select().from(donations).orderBy(desc(donations.createdAt), donations.id);
+      const parsedDonations = d.map(don => {
+        let parsedItems = [];
+        let parsedRequests = [];
+        try { parsedItems = don.items ? (typeof don.items === 'string' ? JSON.parse(don.items) : don.items) : []; } catch (e) { console.error("items parse error:", e); }
+        try { parsedRequests = don.fulfilledRequests ? (typeof don.fulfilledRequests === 'string' ? JSON.parse(don.fulfilledRequests) : don.fulfilledRequests) : []; } catch (e) { console.error("requests parse error:", e); }
+        return {
+          ...don,
+          items: parsedItems,
+          fulfilledRequests: parsedRequests
+        };
+      });
+      const prodRes = await db.select().from(products).orderBy(products.createdAt, products.id);
+      const iss = await db.select().from(issues).orderBy(desc(issues.createdAt), issues.id);
       
       res.json({
         containers: c,
         requests: rq,
         reports: rp,
-        donations: d,
+        donations: parsedDonations,
         products: prodRes,
         issues: iss
       });
@@ -209,7 +235,7 @@ async function startServer() {
   // Containers
   app.get("/api/containers", async (req, res) => {
     try {
-      res.json(await db.select().from(containers));
+      res.json(await db.select().from(containers).orderBy(containers.containerFullId, containers.id));
     } catch (err) {
       console.error(err); res.status(500).json({ error: "Veritabanı hatası", details: err?.message || String(err) });
     }
@@ -255,7 +281,7 @@ async function startServer() {
   app.get("/api/requests", async (req, res) => {
     try {
       let query = db.select().from(requests).$dynamic();
-      const allReqs = await query.orderBy(desc(requests.createdAt));
+      const allReqs = await query.orderBy(desc(requests.createdAt), requests.id);
       let filtered = allReqs;
       if (req.query.containerId) filtered = filtered.filter(r => r.containerId === req.query.containerId);
       if (req.query.status) filtered = filtered.filter(r => r.status === req.query.status);
@@ -273,19 +299,68 @@ async function startServer() {
         quantity: req.body.quantity,
         status: req.body.status,
         requestDate: parseDate(req.body.requestDate),
-        notes: req.body.notes
+        notes: req.body.notes,
+        size: req.body.size,
+        age: req.body.age
       };
+      
+      // Update product stock
+      const productRows = await db.select().from(products).where(eq(products.id, req.body.productId));
+      if (productRows.length > 0) {
+        const product = productRows[0];
+        const newStock = Math.max(0, (product.stockQuantity || 0) - req.body.quantity);
+        await db.update(products).set({
+          stockQuantity: newStock,
+          inStock: newStock > 0 && product.inStock
+        }).where(eq(products.id, req.body.productId));
+      }
+
       const result = await db.insert(requests).values(nr).returning();
       res.json(result[0]);
     } catch (err) {
       console.error(err);
-      console.error(err); res.status(500).json({ error: "Veritabanı hatası", details: err?.message || String(err) });
+      res.status(500).json({ error: "Veritabanı hatası", details: err?.message || String(err) });
     }
   });
   app.put("/api/requests/:id", async (req, res) => {
     try {
+      const existing = await db.select().from(requests).where(eq(requests.id, req.params.id));
+      if (existing.length === 0) return res.status(404).json({ message: "Bulunamadı" });
+
+      const oldStatus = existing[0].status;
+      const newStatus = req.body.status;
+
       const result = await db.update(requests).set(req.body).where(eq(requests.id, req.params.id)).returning();
-      result.length > 0 ? res.json(result[0]) : res.status(404).json({ message: "Bulunamadı" });
+
+      if (oldStatus !== 'approved' && newStatus === 'approved') {
+        const productRows = await db.select().from(products).where(eq(products.id, existing[0].productId));
+        if (productRows.length > 0) {
+           const p = productRows[0];
+           const newStock = Math.max(0, (p.stockQuantity ?? 100) - existing[0].quantity);
+           const updateData: any = { stockQuantity: newStock };
+           if (existing[0].size && p.sizesStock && (p.sizesStock as any)[existing[0].size] !== undefined) {
+             const newSizesStock = { ...(p.sizesStock as Record<string, number>) };
+             newSizesStock[existing[0].size] = Math.max(0, newSizesStock[existing[0].size] - existing[0].quantity);
+             updateData.sizesStock = newSizesStock;
+           }
+           await db.update(products).set(updateData).where(eq(products.id, p.id));
+        }
+      } else if (oldStatus === 'approved' && (newStatus === 'pending' || newStatus === 'rejected' || newStatus === 'cancelled')) {
+        const productRows = await db.select().from(products).where(eq(products.id, existing[0].productId));
+        if (productRows.length > 0) {
+           const p = productRows[0];
+           const newStock = (p.stockQuantity ?? 100) + existing[0].quantity;
+           const updateData: any = { stockQuantity: newStock };
+           if (existing[0].size && p.sizesStock && (p.sizesStock as any)[existing[0].size] !== undefined) {
+             const newSizesStock = { ...(p.sizesStock as Record<string, number>) };
+             newSizesStock[existing[0].size] += existing[0].quantity;
+             updateData.sizesStock = newSizesStock;
+           }
+           await db.update(products).set(updateData).where(eq(products.id, p.id));
+        }
+      }
+
+      res.json(result[0]);
     } catch (err) {
       console.error(err); res.status(500).json({ error: "Veritabanı hatası", details: err?.message || String(err) });
     }
@@ -311,7 +386,7 @@ async function startServer() {
   // Reports
   app.get("/api/reports", async (req, res) => {
     try {
-      res.json(await db.select().from(reports).orderBy(desc(reports.createdAt)));
+      res.json(await db.select().from(reports).orderBy(desc(reports.createdAt), reports.id));
     } catch (err) {
       console.error(err); res.status(500).json({ error: "Veritabanı hatası", details: err?.message || String(err) });
     }
@@ -362,7 +437,7 @@ async function startServer() {
   // Issues
   app.get("/api/issues", async (req, res) => {
     try {
-      res.json(await db.select().from(issues).orderBy(desc(issues.createdAt)));
+      res.json(await db.select().from(issues).orderBy(desc(issues.createdAt), issues.id));
     } catch (err) {
       console.error(err); res.status(500).json({ error: "Veritabanı hatası", details: err?.message || String(err) });
     }
@@ -410,7 +485,7 @@ async function startServer() {
   // Donations
   app.get("/api/donations", async (req, res) => {
     try {
-      const allDonations = await db.select().from(donations).orderBy(desc(donations.createdAt));
+      const allDonations = await db.select().from(donations).orderBy(desc(donations.createdAt), donations.id);
       const parsed = allDonations.map(d => {
         let parsedItems = [];
         let parsedRequests = [];
@@ -547,7 +622,7 @@ async function startServer() {
         session = newSessionRes[0];
       }
       
-      const messagesRes = await db.select().from(chatMessagesTable).where(eq(chatMessagesTable.sessionId, id)).orderBy(chatMessagesTable.timestamp);
+      const messagesRes = await db.select().from(chatMessagesTable).where(eq(chatMessagesTable.sessionId, id)).orderBy(chatMessagesTable.timestamp, chatMessagesTable.id);
       
       res.json({ ...session, messages: messagesRes });
     } catch (err) {
@@ -622,10 +697,10 @@ async function startServer() {
 
   app.get("/api/chat/sessions", async (req, res) => {
     try {
-      const sessions = await db.select().from(chatSessionsTable).orderBy(desc(chatSessionsTable.lastActive));
+      const sessions = await db.select().from(chatSessionsTable).orderBy(desc(chatSessionsTable.lastActive), chatSessionsTable.id);
       const result = [];
       for (const s of sessions) {
-        const messagesRes = await db.select().from(chatMessagesTable).where(eq(chatMessagesTable.sessionId, s.id)).orderBy(chatMessagesTable.timestamp);
+        const messagesRes = await db.select().from(chatMessagesTable).where(eq(chatMessagesTable.sessionId, s.id)).orderBy(chatMessagesTable.timestamp, chatMessagesTable.id);
         result.push({ ...s, messages: messagesRes });
       }
       res.json(result);
